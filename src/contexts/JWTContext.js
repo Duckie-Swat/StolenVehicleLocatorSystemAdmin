@@ -69,6 +69,7 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     const initialize = async () => {
+      console.log('Re-render');
       try {
         const accessToken = window.localStorage.getItem('accessToken');
 

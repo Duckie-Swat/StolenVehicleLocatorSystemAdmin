@@ -1,7 +1,9 @@
+import logger from 'redux-logger'
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch as useAppDispatch, useSelector as useAppSelector } from 'react-redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import { rootPersistConfig, rootReducer } from './rootReducer';
+
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +13,7 @@ const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
       immutableCheck: false,
-    }),
+    }).concat(logger),
 });
 
 const persistor = persistStore(store);

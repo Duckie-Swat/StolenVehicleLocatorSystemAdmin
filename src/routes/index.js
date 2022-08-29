@@ -45,9 +45,11 @@ export default function Router() {
     {
       path: 'dashboard',
       element: (
-        <RoleBasedGuard accessibleRoles={['Admin']}>
-          <DashboardLayout />
-        </RoleBasedGuard>
+        <AuthGuard>
+          <RoleBasedGuard accessibleRoles={['Admin']}>
+            <DashboardLayout />
+          </RoleBasedGuard>
+        </AuthGuard>
       ),
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
