@@ -1,5 +1,6 @@
 import { paramCase } from 'change-case';
-import { useEffect, useRef, useState } from 'react';
+import { debounce } from 'lodash';
+import { useEffect, useState, useCallback } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
@@ -41,24 +42,13 @@ import { getUsers, setPage, setLimit, setKeyword, setOrderDesc, setOrderProperty
 
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
-const ROLE_OPTIONS = [
-  'all',
-  'ux designer',
-  'full stack designer',
-  'backend developer',
-  'project manager',
-  'leader',
-  'ui designer',
-  'ui/ux designer',
-  'front end developer',
-  'full stack developer',
-];
+const ROLE_OPTIONS = ['all', 'Admin', 'Customer'];
 
 const TABLE_HEAD = [
   { id: 'email', label: 'Email', align: 'left' },
   { id: 'fullName', label: 'fullName', align: 'left' },
   { id: 'role', label: 'Role', align: 'left' },
-  { id: 'isVerified', label: 'Verified', align: 'center' },
+  { id: 'emailConfirmed', label: 'Verified', align: 'center' },
   { id: 'status', label: 'Status', align: 'left' },
   { id: '' },
 ];
@@ -79,15 +69,13 @@ export default function UserList() {
 
   const { themeStretch } = useSettings();
 
-  const { users, page, limit, keyword, orderProperty, desc } = useSelector((state) => state.user);
+  const { users, page, limit, keyword, orderProperty, desc, totalItems } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState([]);
-
-  const [filterName, setFilterName] = useState('');
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -100,9 +88,25 @@ export default function UserList() {
       dispatch(setOrderProperty(id));
     }
   };
-  const handleFilterName = (filterName) => {
-    setFilterName(filterName);
-    // setPage(0);
+
+  const debounceSearch = useCallback(
+    debounce((query) => {
+      dispatch(
+        getUsers({
+          page,
+          limit,
+          keyword: query,
+          orderProperty,
+          desc,
+        })
+      );
+    }, 1000),
+    []
+  );
+
+  const handleSearch = (query) => {
+    dispatch(setKeyword(query));
+    debounceSearch(query);
   };
 
   const handleFilterRole = (event) => {
@@ -125,24 +129,11 @@ export default function UserList() {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
-  const dataFiltered = applySortFilter({
-    tableData,
-    comparator: getComparator(desc, orderProperty),
-    filterName,
-    filterRole,
-    filterStatus,
-  });
-
   const onChangeRowsPerPage = (event) => {
     dispatch(setLimit(parseInt(event.target.value, 10)));
   };
 
   const denseHeight = dense ? 52 : 72;
-
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
 
   useEffect(() => {
     dispatch(
@@ -154,17 +145,15 @@ export default function UserList() {
         desc,
       })
     );
-  }, [dispatch, limit, page, keyword, orderProperty, desc]);
+  }, [dispatch, limit, page, orderProperty, desc]);
 
   useEffect(() => {
     if (users) {
-      console.log('Re-render');
       setTableData(
         users.map((user) => {
           return {
             ...user,
             fullName: `${user.firstName} ${user.lastName}`,
-            isVerified: user.emailConfirmed,
           };
         })
       );
@@ -210,9 +199,9 @@ export default function UserList() {
           <Divider />
 
           <UserTableToolbar
-            filterName={filterName}
+            filterName={keyword}
             filterRole={filterRole}
-            onFilterName={handleFilterName}
+            onFilterName={handleSearch}
             onFilterRole={handleFilterRole}
             optionsRole={ROLE_OPTIONS}
           />
@@ -257,7 +246,7 @@ export default function UserList() {
                 />
 
                 <TableBody>
-                  {dataFiltered.slice((page - 1) * limit, (page - 1) * limit + limit).map((row) => (
+                  {tableData.slice((page - 1) * limit, (page - 1) * limit + limit).map((row) => (
                     <UserTableRow
                       key={row.id}
                       row={row}
@@ -270,7 +259,7 @@ export default function UserList() {
 
                   <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page - 1, limit, tableData.length)} />
 
-                  <TableNoData isNotFound={isNotFound} />
+                  {/* <TableNoData isNotFound={isNotFound} /> */}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -280,7 +269,7 @@ export default function UserList() {
             <TablePagination
               rowsPerPageOptions={[20, 30, 50]}
               component="div"
-              count={dataFiltered.length}
+              count={totalItems}
               rowsPerPage={limit}
               page={page - 1}
               onPageChange={setPage}
@@ -297,32 +286,4 @@ export default function UserList() {
       </Container>
     </Page>
   );
-}
-
-// ----------------------------------------------------------------------
-
-function applySortFilter({ tableData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = tableData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  tableData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    tableData = tableData.filter((item) => item.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
-  }
-
-  if (filterStatus !== 'all') {
-    tableData = tableData.filter((item) => item.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    tableData = tableData.filter((item) => item.role === filterRole);
-  }
-
-  return tableData;
 }
