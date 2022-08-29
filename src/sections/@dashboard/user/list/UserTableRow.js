@@ -2,11 +2,13 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Checkbox, TableRow, TableCell, Typography, MenuItem } from '@mui/material';
+import { Checkbox, TableRow, TableCell, Typography, MenuItem } from '@mui/material';
+import Avatar from '../../../../components/Avatar';
 // components
 import Label from '../../../../components/Label';
 import Iconify from '../../../../components/Iconify';
 import { TableMoreMenu } from '../../../../components/table';
+import createAvatar from '../../../../utils/createAvatar';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +23,7 @@ UserTableRow.propTypes = {
 export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { name, avatarUrl, company, role, isVerified, status } = row;
+  const { email, avatarUrl, fullName, roles, isVerified, status } = row;
 
   const [openMenu, setOpenMenuActions] = useState(null);
 
@@ -40,16 +42,21 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
       </TableCell>
 
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar alt={name} src={avatarUrl} sx={{ mr: 2 }} />
+        <Avatar
+          alt={fullName}
+          src={avatarUrl || createAvatar(fullName).name}
+          sx={{ mr: 2 }}
+          color={avatarUrl ? 'default' : createAvatar(fullName).color}
+        />
         <Typography variant="subtitle2" noWrap>
-          {name}
+          {email}
         </Typography>
       </TableCell>
 
-      <TableCell align="left">{company}</TableCell>
+      <TableCell align="left">{fullName}</TableCell>
 
       <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-        {role}
+        {roles}
       </TableCell>
 
       <TableCell align="center">

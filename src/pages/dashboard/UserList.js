@@ -1,6 +1,7 @@
 import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import {
   Box,
@@ -35,8 +36,8 @@ import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 import { TableEmptyRows, TableHeadCustom, TableNoData, TableSelectedActions } from '../../components/table';
 // sections
 import { UserTableToolbar, UserTableRow } from '../../sections/@dashboard/user/list';
-
 // ----------------------------------------------------------------------
+import { getUsers, setPage, setLimit, setKeyword, setOrderDesc, setOrderProperty } from '../../redux/slices/user';
 
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -54,8 +55,8 @@ const ROLE_OPTIONS = [
 ];
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'company', label: 'Company', align: 'left' },
+  { id: 'email', label: 'Email', align: 'left' },
+  { id: 'fullName', label: 'fullName', align: 'left' },
   { id: 'role', label: 'Role', align: 'left' },
   { id: 'isVerified', label: 'Verified', align: 'center' },
   { id: 'status', label: 'Status', align: 'left' },
@@ -67,28 +68,24 @@ const TABLE_HEAD = [
 export default function UserList() {
   const {
     dense,
-    page,
-    order,
-    orderBy,
-    rowsPerPage,
-    setPage,
     //
     selected,
     setSelected,
     onSelectRow,
     onSelectAllRows,
     //
-    onSort,
     onChangeDense,
-    onChangePage,
-    onChangeRowsPerPage,
   } = useTable();
 
   const { themeStretch } = useSettings();
 
+  const { users, page, limit, keyword, orderProperty, desc } = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState([]);
 
   const [filterName, setFilterName] = useState('');
 
@@ -96,9 +93,16 @@ export default function UserList() {
 
   const { currentTab: filterStatus, onChangeTab: onChangeFilterStatus } = useTabs('all');
 
+  const onSort = (id) => {
+    const isAsc = orderProperty === id && desc === false;
+    if (id !== '') {
+      dispatch(setOrderDesc(isAsc));
+      dispatch(setOrderProperty(id));
+    }
+  };
   const handleFilterName = (filterName) => {
     setFilterName(filterName);
-    setPage(0);
+    // setPage(0);
   };
 
   const handleFilterRole = (event) => {
@@ -123,11 +127,15 @@ export default function UserList() {
 
   const dataFiltered = applySortFilter({
     tableData,
-    comparator: getComparator(order, orderBy),
+    comparator: getComparator(desc, orderProperty),
     filterName,
     filterRole,
     filterStatus,
   });
+
+  const onChangeRowsPerPage = (event) => {
+    dispatch(setLimit(parseInt(event.target.value, 10)));
+  };
 
   const denseHeight = dense ? 52 : 72;
 
@@ -135,6 +143,33 @@ export default function UserList() {
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
+
+  useEffect(() => {
+    dispatch(
+      getUsers({
+        page,
+        limit,
+        keyword,
+        orderProperty,
+        desc,
+      })
+    );
+  }, [dispatch, limit, page, keyword, orderProperty, desc]);
+
+  useEffect(() => {
+    if (users) {
+      console.log('Re-render');
+      setTableData(
+        users.map((user) => {
+          return {
+            ...user,
+            fullName: `${user.firstName} ${user.lastName}`,
+            isVerified: user.emailConfirmed,
+          };
+        })
+      );
+    }
+  }, [users]);
 
   return (
     <Page title="User: List">
@@ -207,8 +242,8 @@ export default function UserList() {
 
               <Table size={dense ? 'small' : 'medium'}>
                 <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
+                  order={desc ? 'desc' : 'asc'}
+                  orderBy={orderProperty}
                   headLabel={TABLE_HEAD}
                   rowCount={tableData.length}
                   numSelected={selected.length}
@@ -222,7 +257,7 @@ export default function UserList() {
                 />
 
                 <TableBody>
-                  {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  {dataFiltered.slice((page - 1) * limit, (page - 1) * limit + limit).map((row) => (
                     <UserTableRow
                       key={row.id}
                       row={row}
@@ -233,7 +268,7 @@ export default function UserList() {
                     />
                   ))}
 
-                  <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
+                  <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page - 1, limit, tableData.length)} />
 
                   <TableNoData isNotFound={isNotFound} />
                 </TableBody>
@@ -243,12 +278,12 @@ export default function UserList() {
 
           <Box sx={{ position: 'relative' }}>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
+              rowsPerPageOptions={[20, 30, 50]}
               component="div"
               count={dataFiltered.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={onChangePage}
+              rowsPerPage={limit}
+              page={page - 1}
+              onPageChange={setPage}
               onRowsPerPageChange={onChangeRowsPerPage}
             />
 
