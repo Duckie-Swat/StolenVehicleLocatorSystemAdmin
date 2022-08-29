@@ -23,7 +23,7 @@ UserTableRow.propTypes = {
 export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { email, avatarUrl, fullName, roles, isVerified, status } = row;
+  const { email, avatarUrl, fullName, roles, emailConfirmed, status } = row;
 
   const [openMenu, setOpenMenuActions] = useState(null);
 
@@ -61,12 +61,12 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
       <TableCell align="center">
         <Iconify
-          icon={isVerified ? 'eva:checkmark-circle-fill' : 'eva:clock-outline'}
+          icon={emailConfirmed ? 'eva:checkmark-circle-fill' : 'eva:clock-outline'}
           sx={{
             width: 20,
             height: 20,
             color: 'success.main',
-            ...(!isVerified && { color: 'warning.main' }),
+            ...(!emailConfirmed && { color: 'warning.main' }),
           }}
         />
       </TableCell>
