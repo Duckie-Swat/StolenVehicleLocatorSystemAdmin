@@ -1,6 +1,6 @@
 // Auth
 export const LOGIN_ENDPOINT = '/api/v1/auth/login';
-export const REGISTER_ENDPOINT = '/api/v1/auth/register';
+export const CHANGE_PASSWORD_ENDPOINT = '/api/v1/auth/my-account/password';
 export const MY_PROFILE_ENDPOINT = '/api/v1/auth/my-account';
 // USER
-export const LIST_PAGINATED_USERS_ENDPOINT = '/api/v1/users/find'
+export const LIST_PAGINATED_USERS_ENDPOINT = '/api/v1/users/find';

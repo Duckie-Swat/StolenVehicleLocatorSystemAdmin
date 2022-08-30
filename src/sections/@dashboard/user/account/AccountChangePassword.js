@@ -1,17 +1,23 @@
 import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
+
+import { useDispatch } from 'react-redux';
+
 // form
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 // @mui
 import { Stack, Card } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import Swal from 'sweetalert2';
 // components
 import { FormProvider, RHFTextField } from '../../../../components/hook-form';
-
+import axios from '../../../../utils/axios';
+import { CHANGE_PASSWORD_ENDPOINT } from '../../../../constants/apiEndpointConstants';
 // ----------------------------------------------------------------------
 
 export default function AccountChangePassword() {
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
   const ChangePassWordSchema = Yup.object().shape({
@@ -39,11 +45,17 @@ export default function AccountChangePassword() {
 
   const onSubmit = async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await axios.patch(CHANGE_PASSWORD_ENDPOINT, methods.getValues());
       reset();
       enqueueSnackbar('Update success!');
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: error?.message || `Something went wrong!`,
+        showConfirmButton: true,
+      });
     }
   };
 
