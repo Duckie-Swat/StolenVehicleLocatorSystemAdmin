@@ -51,7 +51,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function EcommerceProductList() {
+export default function LostVehiclesList() {
   const {
     dense,
     page,
@@ -113,7 +113,7 @@ export default function EcommerceProductList() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.eCommerce.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.lostVehicles.edit(paramCase(id)));
   };
 
   const dataFiltered = applySortFilter({
@@ -127,7 +127,7 @@ export default function EcommerceProductList() {
   const isNotFound = (!dataFiltered.length && !!filterName) || (!isLoading && !dataFiltered.length);
 
   return (
-    <Page title="Ecommerce: Product List">
+    <Page title="lostVehicles: Product List">
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <HeaderBreadcrumbs
           heading="Product List"
@@ -135,7 +135,7 @@ export default function EcommerceProductList() {
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             {
               name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
+              href: PATH_DASHBOARD.lostVehicles.root,
             },
             { name: 'Product List' },
           ]}
@@ -144,7 +144,7 @@ export default function EcommerceProductList() {
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
               component={RouterLink}
-              to={PATH_DASHBOARD.eCommerce.new}
+              to={PATH_DASHBOARD.lostVehicles.new}
             >
               New Product
             </Button>
