@@ -5,7 +5,7 @@ import axios from '../utils/axios';
 import { isValidToken, setSession } from '../utils/jwt';
 
 // ----------------------------------------------------------------------
-import { LOGIN_ENDPOINT, MY_PROFILE_ENDPOINT } from '../constants/apiEndpointConstants';
+import { LOGIN_ENDPOINT, MY_PROFILE_ENDPOINT, LOGOUT_ENDPOINT } from '../constants/apiEndpointConstants';
 
 const initialState = {
   isAuthenticated: false,
@@ -115,8 +115,8 @@ function AuthProvider({ children }) {
       email,
       password,
     });
-    const { accessToken, user } = response.data;
-
+    const { accessToken, user, refreshToken } = response.data;
+    window.localStorage.setItem('refreshToken', refreshToken);
     setSession(accessToken);
     dispatch({
       type: 'LOGIN',
@@ -133,9 +133,10 @@ function AuthProvider({ children }) {
       firstName,
       lastName,
     });
-    const { accessToken, user } = response.data;
+    const { accessToken, user, refreshToken } = response.data;
 
     window.localStorage.setItem('accessToken', accessToken);
+    window.localStorage.setItem('refreshToken', refreshToken);
     dispatch({
       type: 'REGISTER',
       payload: {
@@ -145,7 +146,13 @@ function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    await axios.post(LOGOUT_ENDPOINT, null, {
+      params: {
+        refreshToken: window.localStorage.getItem('refreshToken'),
+      },
+    });
     setSession(null);
+    window.localStorage.removeItem('refreshToken');
     dispatch({ type: 'LOGOUT' });
   };
 

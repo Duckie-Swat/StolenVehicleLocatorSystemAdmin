@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Container, Alert, AlertTitle, Link } from '@mui/material';
 import { useNavigate } from 'react-router';
 import jwtDecode from 'jwt-decode';
+import useAuth from '../hooks/useAuth';
 // ----------------------------------------------------------------------
 
 RoleBasedGuard.propTypes = {
@@ -20,9 +21,9 @@ const useCurrentRole = () => {
 export default function RoleBasedGuard({ accessibleRoles, children }) {
   const currentRole = useCurrentRole();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   if (!accessibleRoles.includes(currentRole)) {
-    localStorage.removeItem('accessToken');
     return (
       <Container>
         <Alert severity="error">
@@ -30,7 +31,8 @@ export default function RoleBasedGuard({ accessibleRoles, children }) {
           You do not have permission to access this page. Click{' '}
           <Link
             title="Login"
-            onClick={() => {
+            onClick={async () => {
+              await logout();
               navigate('/auth/login');
             }}
             style={{ cursor: 'pointer' }}
