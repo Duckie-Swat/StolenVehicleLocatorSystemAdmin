@@ -135,6 +135,10 @@ export default function UserList() {
 
   const denseHeight = dense ? 52 : 72;
 
+  const onPageChange = (event, newPage) => {
+    dispatch(setPage(newPage + 1));
+  };
+
   useEffect(() => {
     dispatch(
       getUsers({
@@ -246,7 +250,7 @@ export default function UserList() {
                 />
 
                 <TableBody>
-                  {tableData.slice((page - 1) * limit, (page - 1) * limit + limit).map((row) => (
+                  {tableData.map((row) => (
                     <UserTableRow
                       key={row.id}
                       row={row}
@@ -272,7 +276,7 @@ export default function UserList() {
               count={totalItems}
               rowsPerPage={limit}
               page={page - 1}
-              onPageChange={setPage}
+              onPageChange={onPageChange}
               onRowsPerPageChange={onChangeRowsPerPage}
             />
 
