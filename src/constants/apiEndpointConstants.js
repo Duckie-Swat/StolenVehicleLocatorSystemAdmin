@@ -6,7 +6,7 @@ export const LOGOUT_ENDPOINT = '/api/v1/auth/my-account/logout';
 // USER
 export const LIST_PAGINATED_USERS_ENDPOINT = '/api/v1/users/find';
 // Camera
-export const LIST_PAGINATED_CAMERAS_ENDPOINT = '/api/v1/users/my-account/cameras/find';
+export const LIST_PAGINATED_CAMERAS_ENDPOINT = '/api/v1/cameras/find';
 export const CAMERA_ENDPOINT = '/api/v1/cameras';
 
 // Notification

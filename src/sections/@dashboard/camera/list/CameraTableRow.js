@@ -8,11 +8,10 @@ import { fDateTime } from '../../../../utils/formatTime';
 import Label from '../../../../components/Label';
 import Iconify from '../../../../components/Iconify';
 import { TableMoreMenu } from '../../../../components/table';
-import lostVehicleRequestStatusConstants from '../../../../constants/lostVehicleRequestStatusConstants';
 
 // ----------------------------------------------------------------------
 
-LostVehicleRequestTableRow.propTypes = {
+CameraTableRow.propTypes = {
   row: PropTypes.object,
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
@@ -20,10 +19,10 @@ LostVehicleRequestTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
 };
 
-export default function LostVehicleRequestTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
+export default function CameraTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { plateNumber, vehicleType, location, createdAt, lastUpdatedAt, status, user } = row;
+  const { name, createdAt, lastUpdatedAt, status, user } = row;
 
   const [openMenu, setOpenMenuActions] = useState(null);
 
@@ -43,13 +42,9 @@ export default function LostVehicleRequestTableRow({ row, selected, onEditRow, o
 
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography variant="subtitle2" noWrap>
-          {plateNumber}
+          {name}
         </Typography>
       </TableCell>
-
-      <TableCell align="left">{vehicleType}</TableCell>
-
-      <TableCell align="left">{location}</TableCell>
 
       <TableCell align="left">{fDateTime(createdAt)}</TableCell>
 
@@ -60,16 +55,10 @@ export default function LostVehicleRequestTableRow({ row, selected, onEditRow, o
       <TableCell align="left">
         <Label
           variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-          color={
-            (status === lostVehicleRequestStatusConstants.PROCESSING && 'warning') ||
-            (status === lostVehicleRequestStatusConstants.SUCCESS && 'success') ||
-            'error'
-          }
+          color={(status === 'banned' && 'error') || 'success'}
           sx={{ textTransform: 'capitalize' }}
         >
-          {(status === lostVehicleRequestStatusConstants.PROCESSING && 'processing') ||
-            (status === lostVehicleRequestStatusConstants.SUCCESS && 'success') ||
-            'abanonded'}
+          {status}
         </Label>
       </TableCell>
 
@@ -88,7 +77,7 @@ export default function LostVehicleRequestTableRow({ row, selected, onEditRow, o
                 sx={{ color: 'error.main' }}
               >
                 <Iconify icon={'eva:trash-2-outline'} />
-                Abandon
+                Delete
               </MenuItem>
               <MenuItem
                 onClick={() => {
