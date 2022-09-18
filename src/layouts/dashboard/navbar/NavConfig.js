@@ -42,13 +42,12 @@ const navConfig = [
 
       // LOST VEHICLES
       {
-        title: 'lost-vehicles',
+        title: 'lost vehicles',
         path: PATH_DASHBOARD.lostVehicles.root,
         icon: ICONS.lostVehicles,
         children: [
           { title: 'list', path: PATH_DASHBOARD.lostVehicles.list },
           { title: 'create', path: PATH_DASHBOARD.lostVehicles.new },
-          { title: 'edit', path: PATH_DASHBOARD.lostVehicles.demoEdit },
         ],
       },
 
@@ -65,7 +64,7 @@ const navConfig = [
 
       // DETECTED RESULTS
       {
-        title: 'detected-results',
+        title: 'detected results',
         path: PATH_DASHBOARD.detectedResults.root,
         icon: ICONS.camera,
         children: [{ title: 'list', path: PATH_DASHBOARD.detectedResults.list }],

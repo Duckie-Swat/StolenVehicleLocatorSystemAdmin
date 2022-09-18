@@ -55,8 +55,8 @@ export const PATH_DASHBOARD = {
   lostVehicles: {
     root: path(ROOTS_DASHBOARD, '/lost-vehicles'),
     list: path(ROOTS_DASHBOARD, '/lost-vehicles/list'),
-    new: path(ROOTS_DASHBOARD, '/e-commerce/product/new'),
-    edit: (name) => path(ROOTS_DASHBOARD, `/e-commerce/product/${name}/edit`),
+    new: path(ROOTS_DASHBOARD, '/lost-vehicles/new'),
+    edit: (name) => path(ROOTS_DASHBOARD, `/lost-vehicles/${name}/edit`),
   },
   invoice: {
     root: path(ROOTS_DASHBOARD, '/invoice'),

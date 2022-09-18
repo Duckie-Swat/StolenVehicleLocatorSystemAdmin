@@ -7,7 +7,7 @@ export default function useCountdown(date) {
     days: '00',
     hours: '00',
     minutes: '00',
-    seconds: '00'
+    seconds: '00',
   });
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function useCountdown(date) {
   const setNewTime = () => {
     const startTime = date;
     const endTime = new Date();
-    const distanceToNow = startTime - endTime;
+    const distanceToNow = Math.abs(startTime - endTime);
 
     const getDays = Math.floor(distanceToNow / (1000 * 60 * 60 * 24));
     const getHours = `0${Math.floor((distanceToNow % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))}`.slice(-2);
@@ -30,7 +30,7 @@ export default function useCountdown(date) {
       days: getDays || '000',
       hours: getHours || '000',
       minutes: getMinutes || '000',
-      seconds: getSeconds || '000'
+      seconds: getSeconds || '000',
     });
   };
 
