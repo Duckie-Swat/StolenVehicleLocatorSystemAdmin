@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import {
   Box,
+  Tab,
+  Tabs,
   Card,
   Table,
   Switch,
@@ -22,34 +24,24 @@ import {
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // hooks
-
+import useTabs from '../../hooks/useTabs';
 import useSettings from '../../hooks/useSettings';
-import useTable, { emptyRows } from '../../hooks/useTable';
+import useTable, { getComparator, emptyRows } from '../../hooks/useTable';
+// _mock_
+import { _userList } from '../../_mock';
 // components
 import Page from '../../components/Page';
 import Iconify from '../../components/Iconify';
 import Scrollbar from '../../components/Scrollbar';
 import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
-import { TableEmptyRows, TableHeadCustom, TableSelectedActions } from '../../components/table';
+import { TableEmptyRows, TableHeadCustom, TableNoData, TableSelectedActions } from '../../components/table';
 // sections
-import {
-  LostVehicleRequestTableToolbar,
-  LostVehicleRequestTableRow,
-} from '../../sections/@dashboard/lost-vehicles/list';
+import { CameraTableToolbar, CameraTableRow } from '../../sections/@dashboard/camera/list';
 // ----------------------------------------------------------------------
-import {
-  getLostVehicleRequest,
-  setPage,
-  setLimit,
-  setKeyword,
-  setOrderDesc,
-  setOrderProperty,
-} from '../../redux/slices/lostVehicleRequest';
+import { getCameras, setPage, setLimit, setKeyword, setOrderDesc, setOrderProperty } from '../../redux/slices/camera';
 
 const TABLE_HEAD = [
-  { id: 'plateNumber', label: 'Plate Number', align: 'left' },
-  { id: 'vehicleType', label: 'Vehicle Type', align: 'left' },
-  { id: 'location', label: 'Location', align: 'left' },
+  { id: 'name', label: 'Name', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
   { id: 'lastUpdatedAt', label: 'Last Updated At', align: 'left' },
   { id: 'createdBy', label: 'Created By', align: 'left' },
@@ -59,7 +51,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function LostVehicleRequestList() {
+export default function CameraList() {
   const {
     dense,
     //
@@ -73,15 +65,15 @@ export default function LostVehicleRequestList() {
 
   const { themeStretch } = useSettings();
 
-  const { lostVehicleRequests, page, limit, keyword, orderProperty, desc, totalItems } = useSelector(
-    (state) => state.lostVehicleRequest
-  );
+  const { cameras, page, limit, keyword, orderProperty, desc, totalItems } = useSelector((state) => state.camera);
 
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState([]);
+
+  const [filterRole, setFilterRole] = useState('all');
 
   const onSort = (id) => {
     const isAsc = orderProperty === id && desc === false;
@@ -94,7 +86,7 @@ export default function LostVehicleRequestList() {
   const debounceSearch = useCallback(
     debounce((query) => {
       dispatch(
-        getLostVehicleRequest({
+        getCameras({
           page,
           limit,
           keyword: query,
@@ -111,6 +103,10 @@ export default function LostVehicleRequestList() {
     debounceSearch(query);
   };
 
+  const handleFilterRole = (event) => {
+    setFilterRole(event.target.value);
+  };
+
   const handleDeleteRow = (id) => {
     const deleteRow = tableData.filter((row) => row.id !== id);
     setSelected([]);
@@ -124,7 +120,7 @@ export default function LostVehicleRequestList() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.lostVehicles.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.camera.edit(paramCase(id)));
   };
 
   const onChangeRowsPerPage = (event) => {
@@ -139,7 +135,7 @@ export default function LostVehicleRequestList() {
 
   useEffect(() => {
     dispatch(
-      getLostVehicleRequest({
+      getCameras({
         page,
         limit,
         keyword,
@@ -150,29 +146,29 @@ export default function LostVehicleRequestList() {
   }, [dispatch, limit, page, orderProperty, desc]);
 
   useEffect(() => {
-    if (lostVehicleRequests) {
-      setTableData(lostVehicleRequests);
+    if (cameras) {
+      setTableData(cameras);
     }
-  }, [lostVehicleRequests]);
+  }, [cameras]);
 
   return (
-    <Page title="Lost Vehicles: List">
+    <Page title="Camera: List">
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <HeaderBreadcrumbs
-          heading="Lost Vehicles List"
+          heading="Camera List"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Lost Vehicles', href: PATH_DASHBOARD.lostVehicles.root },
+            { name: 'Camera', href: PATH_DASHBOARD.camera.root },
             { name: 'List' },
           ]}
           action={
             <Button
               variant="contained"
               component={RouterLink}
-              to={PATH_DASHBOARD.lostVehicles.new}
+              to={PATH_DASHBOARD.camera.new}
               startIcon={<Iconify icon={'eva:plus-fill'} />}
             >
-              Create New Lost Vehicle Request
+              New Camera
             </Button>
           }
         />
@@ -180,7 +176,12 @@ export default function LostVehicleRequestList() {
         <Card>
           <Divider />
 
-          <LostVehicleRequestTableToolbar filterName={keyword} onFilterName={handleSearch} />
+          <CameraTableToolbar
+            filterName={keyword}
+            filterRole={filterRole}
+            onFilterName={handleSearch}
+            onFilterRole={handleFilterRole}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800, position: 'relative' }}>
@@ -223,7 +224,7 @@ export default function LostVehicleRequestList() {
 
                 <TableBody>
                   {tableData.map((row) => (
-                    <LostVehicleRequestTableRow
+                    <CameraTableRow
                       key={row.id}
                       row={row}
                       selected={selected.includes(row.id)}

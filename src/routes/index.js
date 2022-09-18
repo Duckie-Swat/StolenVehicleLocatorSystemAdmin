@@ -76,7 +76,8 @@ export default function Router() {
           path: 'camera',
           children: [
             { element: <Navigate to="/dashboard/camera/list" replace />, index: true },
-            { path: 'list', element: <UserList /> },
+            { path: 'list', element: <CameraList /> },
+            { path: 'new', element: <CameraCreate /> },
           ],
         },
         {
@@ -135,3 +136,7 @@ const NotFound = Loadable(lazy(() => import('../pages/Page404')));
 // LOST VEHICLE REQUEST
 const CreateLostVehicleRequest = Loadable(lazy(() => import('../pages/dashboard/LostVehicleRequestCreate')));
 const LostVehicleRequestList = Loadable(lazy(() => import('../pages/dashboard/LostVehicleRequestList')));
+
+// CAMERA
+const CameraList = Loadable(lazy(() => import('../pages/dashboard/CameraList')));
+const CameraCreate = Loadable(lazy(() => import('../pages/dashboard/CameraCreate')));
