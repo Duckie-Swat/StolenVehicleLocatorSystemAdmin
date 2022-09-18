@@ -41,17 +41,7 @@ export const PATH_DASHBOARD = {
     banking: path(ROOTS_DASHBOARD, '/banking'),
     booking: path(ROOTS_DASHBOARD, '/booking'),
   },
-  mail: {
-    root: path(ROOTS_DASHBOARD, '/mail'),
-    all: path(ROOTS_DASHBOARD, '/mail/all'),
-  },
-  chat: {
-    root: path(ROOTS_DASHBOARD, '/chat'),
-    new: path(ROOTS_DASHBOARD, '/chat/new'),
-    view: (name) => path(ROOTS_DASHBOARD, `/chat/${name}`),
-  },
-  calendar: path(ROOTS_DASHBOARD, '/calendar'),
-  kanban: path(ROOTS_DASHBOARD, '/kanban'),
+
   user: {
     root: path(ROOTS_DASHBOARD, '/user'),
     new: path(ROOTS_DASHBOARD, '/user/new'),
@@ -64,14 +54,9 @@ export const PATH_DASHBOARD = {
   },
   lostVehicles: {
     root: path(ROOTS_DASHBOARD, '/lost-vehicles'),
-    shop: path(ROOTS_DASHBOARD, '/e-commerce/shop'),
     list: path(ROOTS_DASHBOARD, '/lost-vehicles/list'),
-    checkout: path(ROOTS_DASHBOARD, '/e-commerce/checkout'),
     new: path(ROOTS_DASHBOARD, '/e-commerce/product/new'),
-    view: (name) => path(ROOTS_DASHBOARD, `/e-commerce/product/${name}`),
     edit: (name) => path(ROOTS_DASHBOARD, `/e-commerce/product/${name}/edit`),
-    demoEdit: path(ROOTS_DASHBOARD, '/e-commerce/product/nike-blazer-low-77-vintage/edit'),
-    demoView: path(ROOTS_DASHBOARD, '/e-commerce/product/nike-air-force-1-ndestrukt'),
   },
   invoice: {
     root: path(ROOTS_DASHBOARD, '/invoice'),
@@ -88,6 +73,16 @@ export const PATH_DASHBOARD = {
     new: path(ROOTS_DASHBOARD, '/blog/new'),
     view: (title) => path(ROOTS_DASHBOARD, `/blog/post/${title}`),
     demoView: path(ROOTS_DASHBOARD, '/blog/post/apply-these-7-secret-techniques-to-improve-event'),
+  },
+  camera: {
+    root: path(ROOTS_DASHBOARD, '/camera'),
+    list: path(ROOTS_DASHBOARD, '/camera/list'),
+    new: path(ROOTS_DASHBOARD, '/camera/new'),
+    edit: (name) => path(ROOTS_DASHBOARD, `/camera/${name}/edit`),
+  },
+  detectedResults: {
+    root: path(ROOTS_DASHBOARD, '/detected-results'),
+    list: path(ROOTS_DASHBOARD, '/detected-results/list'),
   },
 };
 
