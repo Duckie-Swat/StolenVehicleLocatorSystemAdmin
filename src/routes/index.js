@@ -56,7 +56,11 @@ export default function Router() {
         { path: 'app', element: <GeneralApp /> },
         {
           path: 'lost-vehicles',
-          children: [{ element: <Navigate to="/coming-soon" replace />, index: true }],
+          children: [
+            { element: <Navigate to="/dashboard/lost-vehicles/list" replace />, index: true },
+            { path: 'list', element: <LostVehicleRequestList /> },
+            { path: 'new', element: <CreateLostVehicleRequest /> },
+          ],
         },
         {
           path: 'user',
@@ -77,7 +81,13 @@ export default function Router() {
         },
         {
           path: 'detected-results',
-          children: [{ element: <Navigate to="/coming-soon" replace />, index: true }],
+          children: [
+            { element: <Navigate to="/coming-soon" replace />, index: true },
+            {
+              path: 'list',
+              element: <Navigate to="/coming-soon" replace />,
+            },
+          ],
         },
       ],
     },
@@ -121,3 +131,7 @@ const Maintenance = Loadable(lazy(() => import('../pages/Maintenance')));
 
 const Page500 = Loadable(lazy(() => import('../pages/Page500')));
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));
+
+// LOST VEHICLE REQUEST
+const CreateLostVehicleRequest = Loadable(lazy(() => import('../pages/dashboard/LostVehicleRequestCreate')));
+const LostVehicleRequestList = Loadable(lazy(() => import('../pages/dashboard/LostVehicleRequestList')));
