@@ -20,10 +20,10 @@ UserTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
 };
 
-export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
+export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow, onRestoreRow }) {
   const theme = useTheme();
 
-  const { email, avatarUrl, fullName, roles, emailConfirmed, status } = row;
+  const { email, avatarUrl, fullName, roles, emailConfirmed, status, isDeleted } = row;
 
   const [openMenu, setOpenMenuActions] = useState(null);
 
@@ -74,10 +74,10 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
       <TableCell align="left">
         <Label
           variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-          color={(status === 'banned' && 'error') || 'success'}
+          color={(isDeleted === true && 'error') || 'success'}
           sx={{ textTransform: 'capitalize' }}
         >
-          {status}
+          {(isDeleted === true && 'Deleted') || 'Active'}
         </Label>
       </TableCell>
 
@@ -90,13 +90,17 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
             <>
               <MenuItem
                 onClick={() => {
-                  onDeleteRow();
+                  if (isDeleted === true) {
+                    onRestoreRow();
+                  } else {
+                    onDeleteRow();
+                  }
                   handleCloseMenu();
                 }}
                 sx={{ color: 'error.main' }}
               >
                 <Iconify icon={'eva:trash-2-outline'} />
-                Delete
+                {(isDeleted === true && 'Restore') || 'Delete'}
               </MenuItem>
               <MenuItem
                 onClick={() => {

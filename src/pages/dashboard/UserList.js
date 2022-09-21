@@ -21,6 +21,7 @@ import {
   TablePagination,
   FormControlLabel,
 } from '@mui/material';
+import { useSnackbar } from 'notistack';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // hooks
@@ -38,9 +39,19 @@ import { TableEmptyRows, TableHeadCustom, TableNoData, TableSelectedActions } fr
 // sections
 import { UserTableToolbar, UserTableRow } from '../../sections/@dashboard/user/list';
 // ----------------------------------------------------------------------
-import { getUsers, setPage, setLimit, setKeyword, setOrderDesc, setOrderProperty } from '../../redux/slices/user';
+import {
+  getUsers,
+  setPage,
+  setLimit,
+  setKeyword,
+  setOrderDesc,
+  setOrderProperty,
+  setIsDeleted,
+} from '../../redux/slices/user';
+import { SOFT_DELETE_USER_ENDPOINT, RESOTRE_USER_ENDPOINT } from '../../constants/apiEndpointConstants';
+import axios from '../../utils/axios';
 
-const STATUS_OPTIONS = ['all', 'active', 'banned'];
+const STATUS_OPTIONS = ['all', 'active', 'deleted'];
 
 const ROLE_OPTIONS = ['all', 'Admin', 'Customer'];
 
@@ -56,6 +67,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function UserList() {
+  const { enqueueSnackbar } = useSnackbar();
   const {
     dense,
     //
@@ -69,7 +81,9 @@ export default function UserList() {
 
   const { themeStretch } = useSettings();
 
-  const { users, page, limit, keyword, orderProperty, desc, totalItems } = useSelector((state) => state.user);
+  const { users, page, limit, keyword, orderProperty, desc, totalItems, isDeleted } = useSelector(
+    (state) => state.user
+  );
 
   const dispatch = useDispatch();
 
@@ -98,6 +112,7 @@ export default function UserList() {
           keyword: query,
           orderProperty,
           desc,
+          isDeleted,
         })
       );
     }, 1000),
@@ -113,10 +128,42 @@ export default function UserList() {
     setFilterRole(event.target.value);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
+  const handleDeleteRow = async (id) => {
+    try {
+      await axios.delete(SOFT_DELETE_USER_ENDPOINT.replace('%s', id));
+      dispatch(
+        getUsers({
+          page,
+          limit,
+          keyword,
+          orderProperty,
+          desc,
+        })
+      );
+      setSelected([]);
+      enqueueSnackbar('Delete user successfully', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Delete user failed', { variant: 'error' });
+    }
+  };
+
+  const handleRestoreRow = async (id) => {
+    try {
+      await axios.patch(RESOTRE_USER_ENDPOINT.replace('%s', id));
+      dispatch(
+        getUsers({
+          page,
+          limit,
+          keyword,
+          orderProperty,
+          desc,
+        })
+      );
+      setSelected([]);
+      enqueueSnackbar('Restore user successfully', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Restore user failed', { variant: 'error' });
+    }
   };
 
   const handleDeleteRows = (selected) => {
@@ -147,9 +194,10 @@ export default function UserList() {
         keyword,
         orderProperty,
         desc,
+        isDeleted,
       })
     );
-  }, [dispatch, limit, page, orderProperty, desc]);
+  }, [dispatch, limit, page, orderProperty, desc, isDeleted]);
 
   useEffect(() => {
     if (users) {
@@ -192,7 +240,14 @@ export default function UserList() {
             variant="scrollable"
             scrollButtons="auto"
             value={filterStatus}
-            onChange={onChangeFilterStatus}
+            onChange={(event, value) => {
+              onChangeFilterStatus(event, value);
+              if (value !== 'all') {
+                dispatch(setIsDeleted(!(value === 'active')));
+              } else {
+                dispatch(setIsDeleted(null));
+              }
+            }}
             sx={{ px: 2, bgcolor: 'background.neutral' }}
           >
             {STATUS_OPTIONS.map((tab) => (
@@ -256,8 +311,15 @@ export default function UserList() {
                       row={row}
                       selected={selected.includes(row.id)}
                       onSelectRow={() => onSelectRow(row.id)}
-                      onDeleteRow={() => handleDeleteRow(row.id)}
+                      onDeleteRow={() => {
+                        // onChangeFilterStatus(null, 'all');
+                        return handleDeleteRow(row.id);
+                      }}
                       onEditRow={() => handleEditRow(row.name)}
+                      onRestoreRow={() => {
+                        onChangeFilterStatus(null, 'all');
+                        return handleRestoreRow(row.id);
+                      }}
                     />
                   ))}
 

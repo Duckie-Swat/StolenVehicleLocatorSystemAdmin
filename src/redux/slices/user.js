@@ -17,6 +17,7 @@ const initialState = {
   limit: 20,
   keyword: '',
   orderProperty: '',
+  isDeleted: null,
 };
 
 const slice = createSlice({
@@ -59,6 +60,9 @@ const slice = createSlice({
     setOrderProperty(state, action) {
       state.orderProperty = action.payload;
     },
+    setIsDeleted(state, action) {
+      state.isDeleted = action.payload;
+    },
   },
 });
 
@@ -67,7 +71,7 @@ export default slice.reducer;
 
 // Actions
 
-export const { setPage, setLimit, setKeyword, setOrderDesc, setOrderProperty } = slice.actions;
+export const { setPage, setLimit, setKeyword, setOrderDesc, setOrderProperty, setIsDeleted } = slice.actions;
 
 export function getUsers(params) {
   return async () => {
