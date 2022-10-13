@@ -55,7 +55,7 @@
     "@react-pdf/renderer": "^2.1.1",
     "@reduxjs/toolkit": "^1.8.0",
     "@turf/bbox": "^6.5.0",
-    "amazon-cognito-identity-js": "^5.2.8",
+    "amazon-cognito-identity-js": "^5.2.10",
     "apexcharts": "^3.33.2",
     "assert": "^2.0.0",
     "autosuggest-highlight": "^3.2.1",
