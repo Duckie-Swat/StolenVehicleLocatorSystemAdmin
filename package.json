@@ -50,7 +50,7 @@
     "@hookform/resolvers": "^2.8.8",
     "@iconify/react": "^3.1.4",
     "@mui/lab": "^5.0.0-alpha.72",
-    "@mui/material": "^5.5.0",
+    "@mui/material": "^5.10.6",
     "@mui/x-data-grid": "^5.6.1",
     "@react-pdf/renderer": "^2.1.1",
     "@reduxjs/toolkit": "^1.8.0",
