@@ -114,6 +114,7 @@ function AuthProvider({ children }) {
     const response = await axios.post(LOGIN_ENDPOINT, {
       email,
       password,
+      responseCaptchaToken: '123',
     });
     const { accessToken, user, refreshToken } = response.data;
     window.localStorage.setItem('refreshToken', refreshToken);
